@@ -1,43 +1,43 @@
-module $.$mol {
+namespace $.$mol {
 	export class $mol_app_signup extends $.$mol_app_signup {
 		
-		nameFirst( ...diff : string[] ) {
-			return $mol_state_local.value( this.stateKey( 'nameFirst' ) , ...diff ) || ''
+		name_first( next? : string ) {
+			return $mol_state_local.value( this.state_key( 'name_first' ) , next ) || ''
 		}
 		
-		nameFirstErrors() {
-			return this.nameFirst() ? [] : [ 'Input required' ]
+		name_first_errors() {
+			return this.name_first() ? [] : [ this.message_required() ]
 		}
 		
-		nameNick( ...diff : string[] ) {
-			return $mol_state_local.value( this.stateKey( 'nameNick' ) , ...diff ) || ''
+		name_nick( next? : string ) {
+			return $mol_state_local.value( this.state_key( 'name_nick' ) , next ) || ''
 		}
 		
-		nameSecond( ...diff : string[] ) {
-			return $mol_state_local.value( this.stateKey( 'nameSecond' ) , ...diff ) || ''
+		name_second( next? : string ) {
+			return $mol_state_local.value( this.state_key( 'name_second' ) , next ) || ''
 		}
 		
-		nameSecondErrors() {
-			var value = this.nameSecond()
+		name_second_errors() {
+			const value = this.name_second()
 			
-			if( value.length === 0 ) return [ 'Input required' ]
+			if( value.length === 0 ) return [ this.message_required() ]
 			
-			var errors : string[] = []
-			if( value.length < 3 ) errors.push( 'More then 2 letter required' )
-			if( value.indexOf( ' ' ) !== -1 ) errors.push( 'Spaces are forbidden' )
+			const errors : string[] = []
+			if( value.length < 3 ) errors.push( this.message_need_more_letters() )
+			if( value.indexOf( ' ' ) !== -1 ) errors.push( this.message_no_spaces() )
 			return errors
 		}
 
-		sex( ...diff : string[] ) {
-			return $mol_state_local.value( this.stateKey( 'sex' ) , ...diff ) || ''
+		sex( next? : string ) {
+			return $mol_state_local.value( this.state_key( 'sex' ) , next ) || ''
 		}
 
-		sexErrors() {
-			return this.sex() ? [] : [ 'Input required' ]
+		sex_errors() {
+			return this.sex() ? [] : [ this.message_required() ]
 		}
 
-		eventSubmit( ...diff : Event[] ) {
-			alert( `Hello, ${this.sex()} ${this.nameFirst()} (${this.nameNick()}) ${this.nameSecond()}!` )
+		event_submit( next? : Event ) {
+			alert( `Hello, ${this.sex()} ${this.name_first()} (${this.name_nick()}) ${this.name_second()}!` )
 		}
 		
 	}

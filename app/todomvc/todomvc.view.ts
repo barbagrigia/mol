@@ -3,13 +3,13 @@ interface $mol_app_todomvc_task {
 	title? : string
 }
 
-module $.$mol {
+namespace $.$mol {
 	
-	export class $mol_app_todomvc_adder extends $.$mol_app_todomvc_adder {
+	export class $mol_app_todomvc_add extends $.$mol_app_todomvc_add {
 		
-		eventPress( ...diff : KeyboardEvent[] ) {
-			switch( diff[0]['code'] || diff[0].key ) {
-				case 'Enter' : return this.eventDone( diff[0] )
+		event_press( next? : KeyboardEvent ) {
+			switch( next.keyCode ) {
+				case $mol_keyboard_code.enter : return this.event_done( next )
 			}
 		}
 		
@@ -17,128 +17,136 @@ module $.$mol {
 	
 	export class $mol_app_todomvc extends $.$mol_app_todomvc {
 		
-		taskIds( ...diff : number[][] ) : number[] {
-			return $mol_state_local.value( this.stateKey( 'taskIds' ) , ...diff ) || []
+		task_ids( next? : number[] ) : number[] {
+			return $mol_state_local.value( this.state_key( 'mol-todos' ) , next ) || []
 		}
 		
-		argCompleted() {
-			return $mol_state_arg.value( this.stateKey( 'completed' ) )
+		arg_completed() {
+			return $mol_state_arg.value( this.state_key( 'completed' ) )
 		}
 
-		@ $mol_prop()
-		groupsByCompleted() {
+		@ $mol_mem()
+		groups_completed() {
 			var groups : { [ index : string ] : number[] } = { 'true' : [] , 'false' : [] }
-			for( let id of this.taskIds() ) {
+			for( let id of this.task_ids() ) {
 				var task = this.task( id )
 				groups[ String( task.completed ) ].push( id )
 			}
 			return groups
 		}
 
-		@ $mol_prop()
-		tasksFiltered() {
-			var completed = this.argCompleted()
+		@ $mol_mem()
+		tasks_filtered() {
+			var completed = this.arg_completed()
 			if( completed ) {
-				return this.groupsByCompleted()[ completed ] || []
+				return this.groups_completed()[ completed ] || []
 			} else {
-				return this.taskIds()
+				return this.task_ids()
 			}
 		}
 
-		@ $mol_prop()
-		allCompleted( ...diff : boolean[] ) {
-			if( diff[0] === void 0 ) return this.groupsByCompleted()[ 'false' ].length === 0
+		@ $mol_mem()
+		completed_all( next? : boolean ) {
+			if( next === void 0 ) return this.groups_completed()[ 'false' ].length === 0
 			
-			for( let id of this.groupsByCompleted()[ String( !diff[0] ) ] ) {
+			for( let id of this.groups_completed()[ String( !next ) ] ) {
 				var task = this.task( id )
-				this.task( id , { title : task.title , completed : diff[0] } )
+				this.task( id , { title : task.title , completed : next } )
 			}
 			
-			return diff[0]
+			return next
 		}
 		
-		allCompleterEnabled() {
-			return this.taskIds().length > 0 
+		head_complete_enabled() {
+			return this.task_ids().length > 0 
 		}
 
-		@ $mol_prop()
-		pendingMessage() {
-			let count = this.groupsByCompleted()[ 'false' ].length
+		@ $mol_mem()
+		pending_message() {
+			let count = this.groups_completed()[ 'false' ].length
 			return ( count === 1 ) ? '1 item left' : `${count} items left`
 		}
+		
+		_id_seed = 0
 
-		@ $mol_prop()
-		eventAdd( ...diff : Event[] ) {
-			var title = this.taskNewTitle() 
+		event_add( next : Event ) {
+			var title = this.task_title_new() 
 			if( !title ) return
 			
-			var id = Date.now()
+			var id = ++ this._id_seed
 			var task = { completed : false , title }
 			this.task( id , task )
 			
-			this.taskIds( this.taskIds().concat( id ) )
-			this.taskNewTitle( '' )
+			this.task_ids( this.task_ids().concat( id ) )
+			this.task_title_new( '' )
 		}
 
-		@ $mol_prop()
-		taskRows() {
-			return this.tasksFiltered().map( ( id , index )=> this.taskRow( index ) )
+		@ $mol_mem()
+		task_rows() {
+			return this.tasks_filtered().map( ( id , index )=> this.Task_row( index ) )
 		}
 		
-		task( id : number , ...diff : $mol_app_todomvc_task[] ) {
-			const key = this.stateKey( `task=${id}` )
-			if( diff[0] === void 0 ) return $mol_state_local.value( key ) || { title : '' , completed : false }
+		task( id : number , next? : $mol_app_todomvc_task ) {
+			const key = this.state_key( `mol-todos-${id}` )
+			if( next === void 0 ) {
+				return $mol_state_local.value<$mol_app_todomvc_task>( key ) || { title : '' , completed : false }
+			}
 			
-			var task = diff[0]
-			if( task && diff[1] ) task = $mol_merge_dict( this.task( id ) , diff[0] )
-			$mol_state_local.value( key , task )
+			$mol_state_local.value( key , next )
 			
-			return task || void 0
+			return next || void 0
 		}
 		
-		@ $mol_prop()
-		taskCompleted( index : number , ...diff : boolean[] ) {
-			var id = this.tasksFiltered()[ index ]
-			if( diff[0] === void 0 ) return this.task( id ).completed
+		@ $mol_mem_key()
+		task_completed( index : number , next? : boolean ) {
+			var id = this.tasks_filtered()[ index ]
+			if( next === void 0 ) return this.task( id ).completed
 			
-			this.task( id , { completed : diff[0] } , {} )
+			this.task( id , $mol_merge_dict( this.task( id ) , { completed : next } ) )
 			
-			return diff[0]
+			return next
 		}
 		
-		@ $mol_prop()
-		taskTitle( index : number , ...diff : string[] ) {
-			var id = this.tasksFiltered()[ index ]
-			if( diff[0] === void 0 ) return this.task( id ).title
+		@ $mol_mem_key()
+		task_title( index : number , next? : string ) {
+			var id = this.tasks_filtered()[ index ]
+			if( next === void 0 ) return this.task( id ).title
 			
-			this.task( id , { title : diff[0] } , {} )
+			this.task( id , $mol_merge_dict( this.task( id ) , { title : next } ) )
 			
-			return diff[0]
+			return next
 		}
 		
-		@$mol_prop()
-		eventTaskDrop( index : number , ...diff : Event[] ) {
-			var tasks = this.tasksFiltered()
+		event_task_drop( index : number , next? : Event ) {
+			var tasks = this.tasks_filtered()
 			var id = tasks[index]
 			tasks = tasks.slice( 0 , index ).concat( tasks.slice( index + 1 , tasks.length ) )
-			this.taskIds( tasks )
 			this.task( id , null )
+			this.task_ids( tasks )
 		}
 
-		eventSanitize() {
-			this.taskIds( this.taskIds().filter( id => {
+		event_sweep() {
+			this.task_ids( this.task_ids().filter( id => {
 				if( !this.task( id ).completed ) return true
 				this.task( id , null )
 				return false
 			} ) )
 		}
 		
-		footerVisible() {
-			return this.taskIds().length > 0
+		panels() {
+			return [
+				this.Head() , 
+				this.List() ,
+				this.foot_visible() ? this.Foot() : null ,
+			]
+		}
+		
+		foot_visible() {
+			return this.task_ids().length > 0
 		}
 
-		sanitizerEnabled() {
-			return this.groupsByCompleted()[ 'true' ].length > 0
+		sweep_enabled() {
+			return this.groups_completed()[ 'true' ].length > 0
 		}
 		
 	}

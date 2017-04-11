@@ -1,0 +1,21 @@
+$mol_bar_demo $mol_row
+	title @ \Group of controls as one control
+	sub /
+		<= Two $mol_bar
+			sub /
+				<= Two_mail $mol_string
+					hint \E-mail
+					value?val <=> value?val \
+				<= Two_submit $mol_button
+					sub /
+						\submit
+		<= Tree $mol_bar
+			sub /
+				<= Three_mail $mol_string
+					hint \E-mail
+					value?val <=> value?val \
+				<= Three_confirm $mol_check_box
+					label / \Confirm
+				<= Three_submit $mol_button
+					sub /
+						\submit

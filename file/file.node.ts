@@ -1,8 +1,8 @@
-module $ {
+namespace $ {
 	
 	export class $mol_file extends $mol_object {
 		
-		@ $mol_prop()
+		@ $mol_mem_key()
 		static absolute( path : string ) {
 			return new $mol_file().setup(
 				obj => {
@@ -15,53 +15,41 @@ module $ {
 			return $mol_file.absolute( $node.path.resolve( path ).replace( /\\/g , '/' ) )
 		}
 		
-		mime() {
-			return 'application/octet-stream'
-		}
-		
 		path() {
 			return '.'
 		}
 		
-		toString() {
-			return this.path()
-		}
-		
-		inspect() {
-			return this.objectPath()
-		}
-		
-		@ $mol_prop()
+		@ $mol_mem()
 		watcher() {
 			const watcher = $node.fs.watch(
 				this.path() ,
 				{ persistent : false } ,
 				( type : string , name : string )=> {
-					if( !name ) this.stat( void 0 )
+					if( !name ) this.stat( void null , $mol_atom_force )
 					else if( !/(^\.|___$)/.test( name ) ) {
 						var file = this.resolve( name )
-						file.stat( void 0 )
+						file.stat( void null , $mol_atom_force )
 					}
 				}
 			)
 			watcher.on(
 				'error' , ( error : Error )=> {
-					this.stat( void 0 , error )
+					this.stat( error , $mol_atom_force )
 				}
 			)
 			
 			return watcher
 		}
 		
-		@ $mol_prop()
-		stat( ...diff : any[] ) {
+		@ $mol_mem()
+		stat( next? : any , force? : $mol_atom_force ) {
 			var path = this.path()
 			
 			try {
-				var stat = $node.fs.statSync( path )
+				var stat = next || $node.fs.statSync( path )
 			} catch( error ) {
 				if( error.code === 'ENOENT' ) return null
-				throw error
+				return error
 			}
 			
 			this.parent().watcher()
@@ -69,29 +57,29 @@ module $ {
 			return stat
 		}
 		
-		@ $mol_prop()
+		@ $mol_mem()
 		version() {
 			return this.stat().mtime.getTime().toString( 36 ).toUpperCase()
 		}
 		
-		exists( ...diff : boolean[] ) {
+		exists( next? : boolean ) {
 			var exists = !!this.stat()
 			
-			if( diff[ 0 ] === void 0 ) {
+			if( next === void 0 ) {
 				return exists
 			} else {
-				if( diff[ 0 ] == exists ) return exists
+				if( next == exists ) return exists
 				
-				if( diff[ 0 ] ) {
+				if( next ) {
 					this.parent().exists( true )
 					$node.fs.mkdirSync( this.path() )
 				} else {
 					$node.fs.unlinkSync( this.path() )
 				}
 				
-				this.stat( void 0 )
+				this.stat( void null , $mol_atom_force )
 				
-				return diff[ 0 ]
+				return next
 			}
 		}
 		
@@ -126,16 +114,16 @@ module $ {
 			return match && match[ 1 ].substring( 1 )
 		}
 		
-		@ $mol_prop()
-		content( ...diff : string[] ) {
-			if( diff[ 0 ] === void 0 ) {
+		@ $mol_mem()
+		content( next? : string , force? : $mol_atom_force ) {
+			if( next === void 0 ) {
 				return this.stat() && $node.fs.readFileSync( this.path() )
 			}
 			
 			this.parent().exists( true )
-			$node.fs.writeFileSync( this.path() , diff[ 0 ] )
+			$node.fs.writeFileSync( this.path() , next )
 			
-			return diff[ 0 ]
+			return next
 		}
 		
 		reader() {
@@ -146,8 +134,8 @@ module $ {
 			return $node.fs.createWriteStream( this.path() )
 		}
 		
-		@ $mol_prop()
-		childs() : $mol_file[] {
+		@ $mol_mem()
+		sub() : $mol_file[] {
 			this.stat()
 			
 			switch( this.type() ) {
@@ -178,7 +166,7 @@ module $ {
 		) {
 			
 			var found : $mol_file[] = []
-			this.childs().forEach(
+			this.sub().forEach(
 				child => {
 					if( exclude && child.path().match( exclude ) ) return
 					if( !include || child.path().match( include ) ) found.push( child )

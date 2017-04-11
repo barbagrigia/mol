@@ -1,0 +1,29 @@
+[mol_switch] {
+	display: flex;
+	flex-wrap: wrap;
+	flex: 0 1 auto;
+	@apply --mol_skin_outline;
+	border-radius: var(--mol_skin_round);
+	background: var(--mol_skin_light_line);
+}
+
+[mol_switch_option] {
+	padding: .5rem 1rem;
+	flex: 1 1 auto;
+	@apply --mol_skin_outline;
+	background: var(--mol_skin_passive);
+}
+
+[mol_switch_option][mol_check_checked] {
+	background: var(--mol_skin_card);
+	color: black;
+	z-index: 1;
+}
+
+[mol_switch_option][mol_check_checked]:not([disabled]):hover {
+	background: var(--mol_skin_light_hover);
+}
+
+[mol_switch_option][disabled] {
+	color: var(--mol_skin_passive_text);
+}

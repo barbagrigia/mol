@@ -1,5 +1,5 @@
-module $ {
-
+namespace $ {
+	
 	/// Common superclass that provides base functionality.
 	export class $mol_object {
 		
@@ -7,64 +7,41 @@ module $ {
 			return this.constructor as any
 		}
 		
-		static objectPath() {
-			let self = <any> this
-			return self[ 'name' ]
-				|| self[ 'displayName' ]
-				|| ( self[ 'displayName' ] = Function.prototype.toString.call( self )
-				.match( /^function ([a-z0-9_$]*)/ )[ 1 ] )
-		}
-		
-		'objectClassNames()' : string[]
-		
-		objectClassNames() {
-			if( this.hasOwnProperty( 'objectClassNames()' ) ) return this[ 'objectClassNames()' ]
-			
-			var names : string[] = []
-			var current = this
-			
-			while( typeof current === 'object' ) {
-				if( !(<typeof $mol_object>current.constructor).objectPath ) break
-				
-				var name = (<typeof $mol_object>current.constructor).objectPath()
-				if( !name ) continue
-				
-				names.push( name )
-				
-				if( current === null ) break
-				current = Object.getPrototypeOf( current )
-			}
-			
-			return this[ 'objectClassNames()' ] = names
+		static toString() : string {
+			return $mol_func_name( this )
 		}
 		
 		/// Owner object.
-		private 'objectOwner()' : { objectPath() : string }
+		private 'object_owner()' : Object
 		
-		objectOwner( next? : { objectPath() : string } ) {
-			if( this[ 'objectOwner()' ] ) return this[ 'objectOwner()' ]
-			return this[ 'objectOwner()' ] = next
+		object_owner( next? : Object ) {
+			if( this[ 'object_owner()' ] ) return this[ 'object_owner()' ]
+			return this[ 'object_owner()' ] = next
 		}
 		
 		/// Field in owner where this object is stored.
-		private 'objectField()' : string
+		private 'object_field()' : string
 		
-		objectField( next? : string ) {
-			if( this[ 'objectField()' ] ) return this[ 'objectField()' ] || ''
-			return this[ 'objectField()' ] = next
+		object_field( next? : string ) {
+			if( this[ 'object_field()' ] ) return this[ 'object_field()' ] || ''
+			return this[ 'object_field()' ] = next
 		}
 		
 		/// JS-path to this object from global scope. Can not be redefined.
-		objectPath( next? : string ) {
+		toString() {
 			var path = ''
 			
-			var owner = this.objectOwner()
-			if( owner ) path = owner.objectPath()
+			var owner = this.object_owner()
+			if( owner ) path = owner.toString()
 			
-			var field = this.objectField()
+			var field = this.object_field()
 			if( field ) path += '.' + field
 			
 			return path
+		}
+		
+		toJSON() {
+			return this.toString()
 		}
 		
 		/// Helper to override fields in fluent style.
@@ -75,25 +52,18 @@ module $ {
 		
 		'destroyed()' = false
 		
-		destroyed( ...diff : boolean[] ) {
-			if( diff[ 0 ] === void 0 ) return this[ 'destroyed()' ]
-			this[ 'destroyed()' ] = diff[ 0 ]
-			this.log( [ '.destroyed()' , diff[ 0 ] ] )
-			return diff[ 0 ]
+		destroyed( next? : boolean ) {
+			if( next === void 0 ) return this[ 'destroyed()' ]
+			this[ 'destroyed()' ] = next
+			this.log( [ '.destroyed()' , next ] )
+			return next
 		}
 		
 		log( values : any[] ) {
 			if( $mol_log.filter() == null ) return
-			$mol_log( this.objectPath() , values )
+			$mol_log( this.toString() , values )
 		}
 		
-		static toString() {
-			return this.objectPath()
-		}
-		
-		toString() {
-			return this.objectPath()
-		}
 	}
 	
 }

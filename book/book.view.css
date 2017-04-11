@@ -1,0 +1,41 @@
+[mol_book] {
+	display: flex;
+	flex-flow: row nowrap;
+	align-items: stretch;
+	justify-content: flex-start;
+	overflow: hidden;
+	flex: 1 1 auto;
+	align-self: stretch;
+	margin: 0;
+}
+
+[mol_book_placeholder] {
+	display: flex;
+	flex: 1000 1 400px;
+	order: 1;
+	align-items: center;
+	justify-content: center;
+	font-size: 2rem;
+	color: var(--mol_skin_passive_text);
+	padding: 1rem;
+}
+
+[mol_book] > *:not([mol_book_page_visible]) {
+	position: absolute;
+	height: 100%;
+	transform: translate( -100% );
+	transition-duration: .2s;
+	transition-timing-function: ease-out;
+}
+
+@keyframes mol_book_page_show {
+	from {
+		transform: translate( 100% );
+	}
+}
+
+[mol_book] > * {
+	position: relative;
+	animation: mol_book_page_show ease-out .2s;
+	background: var(--mol_skin_card);
+}

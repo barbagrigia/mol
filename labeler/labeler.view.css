@@ -1,16 +1,11 @@
 [mol_labeler] {
-	/*display: inline-flex;*/
-	/*align-items: baseline;*/
-	/*flex-wrap: wrap;*/
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	cursor: inherit;
 }
 
-[mol_labeler_titler] {
+[mol_labeler_title] {
 	color: var(--mol_skin_passive_text);
-	font-size: .85rem;
-}
-
-[mol_labeler_contenter] {
-	/*font-weight: bolder;*/
-	/*flex: 0 1 auto;*/
-	/*display: flex;*/
+	font-size: .875rem;
 }

@@ -1,12 +1,20 @@
-module $ {
+namespace $ {
 	
 	export class $mol_http_request extends $mol_object {
 		
-		static native : () => XMLHttpRequest
-		
 		uri() { return '' }
 		
-		method() { return 'Get' }
+		method_get() { return 'Get' }
+		method_put() { return 'Put' }
+		
+		credentials() { return null as {
+			login? : string
+			password? : string
+		} }
+		
+		headers() {
+			return {}
+		}
 		
 		body() { return <any> null }
 		
@@ -14,54 +22,53 @@ module $ {
 		native() {
 			if( this[ 'native()' ] ) return this[ 'native()' ]
 			
-			var next = this[ 'native()' ] = this.Class().native()
+			var next = this[ 'native()' ] = new $mol_dom_context.XMLHttpRequest
+			
+			next.withCredentials = Boolean( this.credentials() )
 			
 			next.onload = ( event : Event )=> {
-				if( Math.floor( next.status / 100 ) === 2 ) {
-					this.response( void 0 , next )
+				if(( next.status === 0 )||( Math.floor( next.status / 100 ) === 2 )) {
+					this.response( next , $mol_atom_force )
 				} else {
-					this.response( void 0 , new Error( next.responseText ) as any )
+					this.response( new Error( next.responseText ) as any , $mol_atom_force )
 				}
 			}
 			
 			next.onerror = ( event : ErrorEvent ) => {
-				this.response( void 0 , event.error || new Error( 'Unknown HTTP error' ) )
+				this.response( event.error || new Error( 'Unknown HTTP error' ) , $mol_atom_force )
 			}
 			
 			return next
 		}
 		
-		destroyed( ...diff : boolean[] ) {
-			if( diff[ 0 ] ) {
+		destroyed( next? : boolean ) {
+			if( next ) {
 				const native = this[ 'native()' ]
 				if( native ) native.abort()
 			}
-			return super.destroyed( ...diff )
+			return super.destroyed( next )
 		}
 		
-		@ $mol_prop()
-		response( ...diff : XMLHttpRequest[] ) : XMLHttpRequest {
-			if( diff[ 0 ] !== void 0 ) return diff[ 0 ]
-			
+		@ $mol_mem()
+		response( next? : any , force? : $mol_atom_force ) : XMLHttpRequest {
+			const creds = this.credentials()
 			const native = this.native()
-			native.open( this.method() , this.uri() )
-			native.send( this.body() )
+			const method = ( next === void 0 ) ? this.method_get() : this.method_put()
+			const uri = this.uri()
 			
-			throw new $mol_atom_wait( `${this.method()} ${this.uri()}` )
+			native.open( method , uri , true , creds && creds.login , creds && creds.password )
+			
+			const headers = this.headers()
+			for( let name in headers ) native.setRequestHeader( name , headers[ name ] )
+			
+			native.send( next )
+			
+			throw new $mol_atom_wait( `${ method } ${ uri }` )
 		}
 		
-		text( ...diff : void[] ) : string {
-			if( diff.length === 1 ) this.response( void 0 )
-			else return this.response().responseText
+		text( next? : string , force? : $mol_atom_force ) : string {
+			return this.response( next , force ).responseText
 		}
-		
-		//xml() {
-		//	return this.response().responseXML.documentElement
-		//}
-		//
-		//json< Value >() : Value {
-		//	return JSON.parse( this.text() )
-		//}
 		
 	}
 	

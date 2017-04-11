@@ -1,0 +1,28 @@
+$mol_app_bench $mol_view
+	sub /
+		<= Addon_page $mol_page
+			title <= addon_title @ \Samples
+			body /
+				<= Menu $mol_list
+					rows <= menu_options /
+		<= Main_page $mol_page
+			title <= title -
+			body /
+				<= Inform $mol_view sub /
+					<= Descr $mol_text
+						text <= description \
+					<= Result $mol_bench
+						result <= result null
+						col_head_label!id /
+							<= result_col_title!id / 
+						col_sort?val <=> result_col_sort?val \
+				<= Sandbox $mol_view
+					dom_name \iframe
+	-
+	Menu_option!id $mol_check_box
+		minimal_height 36
+		checked?val <=> menu_option_checked!id?val false
+		label /
+			<= menu_option_title!id \
+	-
+	result_col_title_sample @ \Sample

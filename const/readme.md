@@ -5,12 +5,11 @@ Returns closure that returns constant value. Value can be accessed by `"()"` fie
 ## Usage example
 
 ```typescript
-module $ {
+namespace $ {
 	
-	const foo = { bar : $mol_const( Math.random() ) }
+	const rnd = $mol_const( Math.random() )
 	
-	console.assert( foo.bar() === foo.bar() )
-	console.assert( foo.bar() === foo.bar['()'] )
+	console.assert( rnd() === rnd['()'] )
 	
 }
 ```

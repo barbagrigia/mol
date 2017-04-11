@@ -1,38 +1,39 @@
-module $.$mol {
+namespace $.$mol {
 	export class $mol_number extends $.$mol_number {
-		
-		eventDec( ...diff : Event[] ) {
-			this.value( this.value() - this.precisionChange() )
+
+		event_dec( next? : Event ) {
+			this.value( this.value() - this.precision_change() )
 		}
-		
-		eventInc( ...diff : Event[] ) {
-			this.value( this.value() + this.precisionChange() )
+
+		event_inc( next? : Event ) {
+			this.value( Number( this.value() ) + this.precision_change() )
 		}
-		
-		valueString( ...diff : string[] ) {
-			if( diff[ 0 ] !== void 0 ) {
-				this.value( diff[ 0 ] === '' ? null : Number( diff[ 0 ] ) )
+
+		value_string( next? : string ) {
+			if( next !== void 0 ) {
+				this.value( next === '' ? null : Number( next ) )
 			}
-			
-			var precisionView = this.precisionView()
-			var value = diff[ 0 ] ? Number( diff[ 0 ] ) : this.value()
-			
+
+			const precisionView = this.precision_view()
+			const value = next ? Number( next ) : this.value()
+
 			if( value === null ) return ''
-			
+
 			if( precisionView >= 1 ) {
 				return ( value / precisionView ).toFixed()
 			} else {
-				var fixedNumber = Math.log( 1 / precisionView ) / Math.log( 10 )
+				const fixedNumber = Math.log( 1 / precisionView ) / Math.log( 10 )
 				return value.toFixed( fixedNumber )
 			}
 		}
-		
-		eventWheel( ...diff : MouseWheelEvent[] ) {
-			if( diff[0].wheelDelta > 0 ) {
-				this.eventInc( ...diff )
-			} else {
-				this.eventDec( ...diff )
-			}
+
+		event_wheel( next? : MouseWheelEvent ) {
+			next.preventDefault();
+			if( next.wheelDelta < 0 && this.inc_enabled() )
+				this.event_inc( next )
+			if( next.wheelDelta > 0 && this.dec_enabled())
+				this.event_dec( next )
 		}
+
 	}
 }

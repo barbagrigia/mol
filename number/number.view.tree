@@ -1,21 +1,21 @@
-$mol_number $mol_viewer
-	precisionView < precision 1
-	precisionChange < precision 1
-	> value 0
-	- event * wheel > eventWheel null - speed down scroll when many numbers rendered.
-	childs /
-		< decrementer $mol_number_clicker
-			eventClick > eventDec null
-			enabled < enabledDec < enabled true
-			childs / < decIcon $mol_icon_minus
-		< stringer $mol_stringer
+$mol_number $mol_bar
+	precision_view <= precision 1
+	precision_change <= precision 1
+	value?val null
+	event_async *
+		^
+		wheel?val <=> event_wheel?val null
+	sub /
+		<= Dec $mol_button
+			event_click?val <=> event_dec?val null
+			enabled <= dec_enabled <= enabled true
+			sub / <= dec_icon $mol_icon_minus
+		<= String $mol_string
 			type \number
-			value > valueString \
-			hint < hint \
-			enabled < enabledStringer < enabled true
-		< incrementer $mol_number_clicker
-			eventClick > eventInc null
-			enabled < enabledInc < enabled true
-			childs / < incIcon $mol_icon_plus
-
-$mol_number_clicker $mol_clicker
+			value?val <=> value_string?val \
+			hint <= hint \
+			enabled <= string_enabled <= enabled true
+		<= Inc $mol_button
+			event_click?val <=> event_inc?val null
+			enabled <= inc_enabled <= enabled true
+			sub / <= inc_icon $mol_icon_plus

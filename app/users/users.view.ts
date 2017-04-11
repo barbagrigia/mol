@@ -1,36 +1,28 @@
-module $.$mol {
+namespace $.$mol {
 	
 	/// GitHub users View Model
 	export class $mol_app_users extends $.$mol_app_users {
 		
-		queryArg( ...diff : string[] ) {
-			return $mol_state_arg.value( this.stateKey( 'query' ) , ...diff )
+		query_arg( next? : string ) {
+			return $mol_state_arg.value( this.state_key( 'query' ) , next )
 		}
 		
 		/// Search query string synchronized with argument from URL.
-		@ $mol_prop()
-		query( ...diff : string[] ) : string {
-			const arg = this.queryArg()
+		@ $mol_mem()
+		query( next? : string , force? : $mol_atom_force ) : string {
+			if( next === void null ) return this.query_arg()
 			
-			if( diff[0] === void 0 ) {
-				return arg
-			} else {
-				const query = this.query()
-				
-				this.queryArg( ...diff )
-				
-				if( this._queryTimer ) clearTimeout( this._queryTimer )
-				this._queryTimer = setTimeout( ()=> { this.query( void 0 ) } , 500 )
-				
-				return query
-			}
+			this.query_arg( next )
+			
+			if( this._query_timer ) clearTimeout( this._query_timer )
+			this._query_timer = setTimeout( ()=> { this.query( void null , $mol_atom_force ) } , 500 )
 		}
 		
-		_queryTimer = 0
+		_query_timer = 0
 		
 		/// Data source resource based on this.query()
-		@ $mol_prop()
-		master( ) {
+		@ $mol_mem()
+		master() {
 			var query = this.query()
 			
 			if( query ) {
@@ -44,107 +36,107 @@ module $.$mol {
 		}
 		
 		/// List of child views. Show users and controls only when this.query() is not empty.
-		childs() {
-			var next = [ this.filter() ]
-			if( this.master() ) next = [].concat( next , this.bodier() , this.controller() )
+		sub() {
+			var next = [ this.Head() ]
+			if( this.master() ) next = [].concat( next , this.Body() , this.Foot() )
 			return next
 		}
 		
 		/// Current list of users. May be changed by user.
-		@ $mol_prop()
-		users( ...diff : string[][] ) {
-			return diff[0] || this.usersMaster()
+		@ $mol_mem()
+		users( next? : string[] ) {
+			let usersMaster = this.users_master()
+			return next || usersMaster
 		}
 		
 		/// List of users loaded from server.
-		@ $mol_prop()
-		usersMaster( ...diff : string[][] ) {
+		@ $mol_mem()
+		users_master( next? : string[] , force? : $mol_atom_force ) {
 			if( !this.query() ) return []
 			
 			const master = this.master()
 			
-			if( diff.length === 0 ) {
-				return master.json().items.map( item => item.login ) as string[]
+			if( next === void 0 ) {
+				return master.json( void 0 , force ).items.map( item => item.login ) as string[]
 			}
 			
-			master.json( diff[ 0 ] && { items : diff[ 0 ].map( login => ({ login }) ) } )
+			master.json( next && { items : next.map( login => ({ login }) ) } )
+			
+			return next
 		}
 		
 		/// Status of net communication. Shows errors of downloading|uploading. 
-		@ $mol_prop({
-			fail : ( view : $mol_app_users , error : Error ) => {
-				if( error instanceof $mol_atom_wait ) return error
-				return error.message
-			}
-		})
-		saverResult() {
-			if( !this.master() ) return null
-			if( !this.master().uploaded() ) return null
-			if( this.changed() ) return null
-			
-			return 'Saved.'
+		@ $mol_mem()
+		save_result() {
+			return this.users_master()
 		}
 		
 		/// Reload data from server and discard changes.
-		eventReload( ...diff : Event[] ) {
-			this.master().refresh()
+		event_reload( next? : Event ) {
+			this.users_master( void 0 , $mol_atom_force )
 		}
 		
 		/// Add user with empty name at the end of list.
-		eventAdd( ...diff : Event[] ) {
+		event_add( next? : Event ) {
 			this.users( this.users().concat( '' ) )
 		}
 		
 		/// Remove user from list by id.
-		eventUserDrop( id : number , ...diff : Event[] ) {
+		event_user_drop( id : number , next? : Event ) {
 			this.users( this.users().filter( ( name , i )=> ( i !== id ) ) )
 		}
 		
 		/// Indicates difference between current list and list loaded from server.
 		changed() {
-			return JSON.stringify( this.usersMaster() ) !== JSON.stringify( this.users() )
+			return JSON.stringify( this.users_master() ) !== JSON.stringify( this.users() )
 		}
 		
 		/// Flag to enable some controls when user list loaded.
 		loaded() {
-			return Boolean( this.users() )
+			return Boolean( this.users().valueOf() )
 		}
 		
 		/// Initiates current user list to upload. 
-		eventSave( ...diff : Event[] ) {
+		event_save( next? : Event ) {
 			if( !this.changed() ) return
-			this.usersMaster( this.users() )
+			try {
+				this.users_master( this.users() ).valueOf()
+			} catch( error ) {
+				if( error instanceof $mol_atom_wait ) throw error
+				console.log( '---' , error )
+			}
 		}
 		
 		body() : any[] {
 			if( this.users().length ) {
-				return [ this.lister() ]
+				return [ this.List() ]
 			} else {
 				return [ 'Users not found' ]
 			}
 		}
 		
 		/// Lazy list of user view models. Items are created only when they fits to viewport.
-		@ $mol_prop()
-		userRows() {
-			return this.users().map( ( user , id )=> this.userRow( id ) )
+		@ $mol_mem()
+		user_rows() {
+			return this.users().map( ( user , id )=> this.User_row( id ) )
 		}
 		
 		/// One user view model with injected behaviour.
-		@ $mol_prop()
-		userRow( id : number ) {
-			return new $mol_app_users_item().setup( obj => {
-				obj.title = ( ...diff )=> this.userName( id , ...diff )
-				obj.eventDrop = ( ...diff )=> this.eventUserDrop( id , ...diff )
+		@ $mol_mem_key()
+		User_row( id : number ) {
+			return new $mol_app_users_row().setup( obj => {
+				obj.title = ( next? )=> this.user_name( id , next )
+				obj.event_drop = ( next? )=> this.event_user_drop( id , next )
 			} )
 		}
 		
 		/// Read/write accessor to user name by id.
-		userName( id : number , ...diff : string[] ) {
-			if( diff[0] === void 0 ) return this.users()[ id ] || ''
+		user_name( id : number , next? : string ) {
+			if( next === void 0 ) return this.users()[ id ] || ''
 			
-			this.users( this.users().map( ( name , i )=> ( i === id ) ? diff[0] : name ) )
-			return diff[0]
+			this.users( this.users().map( ( name , i )=> ( i === id ) ? next : name ) )
+			
+			return next
 		}
 		
 	}

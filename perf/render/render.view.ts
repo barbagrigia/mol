@@ -1,47 +1,50 @@
-module $.$mol {
+namespace $.$mol {
 
-	interface $mol_perf_render_item {
+	export interface $mol_perf_render_item {
 		id : number
 		label : string
 	}
 
 	export class $mol_perf_render extends $.$mol_perf_render {
 		
-		@ $mol_prop()
-		runnerLabel( ...diff : string[] ) { return diff[0] || 'Run' }
+		@ $mol_mem()
+		run_label( next? : string ) { return next || 'Run' }
 		
-		eventRun( ...diff : Event[] ) {
+		event_run( next? : Event ) {
 			requestAnimationFrame( ()=> {
 				var data = (<any>window)[ '_buildData' ]()
 				
 				var date = Date.now()
 				
 				this.data( data )
-				this.selectedItem( null )
+				this.selected_item( null )
 				
 				$mol_defer.run()
 				
-				setTimeout( () => this.runnerLabel( (Date.now() - date) + " ms" ) )
+				setTimeout( () => this.run_label( (Date.now() - date) + " ms" ) )
 			} )
  		}
 		
-		@ $mol_prop()
-		rows() { return this.data().map( ( _ , id ) => this.row( id ) ) }
+		@ $mol_mem()
+		rows() { return this.data().map( ( _ , id ) => this.Row( id ) ) }
 		
-		@ $mol_prop()
-		row( id : number ) { return new $mol_perf_render_row().setup( obj => {
+		@ $mol_mem_key()
+		Row( id : number ) { return new $mol_perf_render_row().setup( obj => {
 			obj.data = () => this.data()[ id ]
-			obj.selected = ( ...diff : boolean[] ) => {
-				if( diff[0] !== void 0 ) this.selectedItem( diff[0] === void 0 ? null : id )
-				return this.selectedItem() === id
+			obj.selected = ( next? : boolean ) => {
+				if( next !== void 0 ) this.selected_item( next ? id : null )
+				return this.selected_item() === id
 			}
 		} ) }
 		
-		@ $mol_prop()
-		data( ...diff : $mol_perf_render_item[][] ) { return diff[0] || [] }
+		@ $mol_mem()
+		data( next? : $mol_perf_render_item[] ) { return next || [] }
 		
-		@ $mol_prop()
-		selectedItem( ...diff : number[] ) { return ( diff[0] === void 0 ) ? null : diff[0] }
+		@ $mol_mem()
+		selected_item( next? : number ) { 
+			if( next === void 0 ) return null
+			return next
+		}
 		
 	}
 
@@ -51,7 +54,7 @@ module $.$mol {
 
 		label() { return this.data().label }
 		
-		eventToggle( ...diff : Event[] ) {
+		event_toggle( next? : Event ) {
 			this.selected( !this.selected() )
 		}
 

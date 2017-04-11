@@ -1,23 +1,33 @@
-var localStorage = localStorage || <Storage> {}
+var localStorage = localStorage || <Storage> {
+	getItem( key : string ) {
+		return this[ ':' + key ]
+	} ,
+	setItem( key : string , value : string ) {
+		this[ ':' + key ] = value
+	} ,
+	removeItem( key : string ) {
+		this[ ':' + key ] = void 0
+	}
+}
 
-module $ {
+namespace $ {
 	
 	export class $mol_state_local< Value > extends $mol_object {
 		
-		@ $mol_prop()
-		static value< Value >( key : string , ...diff : Value[] ) {
-			if( diff[ 0 ] === void 0 ) return JSON.parse( localStorage.getItem( key ) || 'null' )
+		@ $mol_mem_key()
+		static value< Value >( key : string , next? : Value , force? : $mol_atom_force ) : Value {
+			if( next === void 0 ) return JSON.parse( localStorage.getItem( key ) || 'null' )
 			
-			if( diff[ 0 ] === null ) localStorage.removeItem( key )
-			else localStorage.setItem( key , JSON.stringify( diff[ 0 ] ) )
+			if( next === null ) localStorage.removeItem( key )
+			else localStorage.setItem( key , JSON.stringify( next ) )
 			
-			return diff[ 0 ]
+			return next
 		}
 		
 		prefix() { return '' }
 		
-		value( key : string , ...diff : Value[] ) {
-			return $mol_state_local.value( this.prefix() + '.' + key , ...diff )
+		value( key : string , next? : Value ) {
+			return $mol_state_local.value( this.prefix() + '.' + key , next )
 		}
 		
 	}

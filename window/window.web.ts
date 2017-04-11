@@ -1,16 +1,22 @@
-module $ {
+namespace $ {
 	
 	export class $mol_window extends $mol_object {
 		
-		@ $mol_prop()
-		static size( ...diff : number[][] ) {
-			return [ window.innerWidth , window.innerHeight ]
+		@ $mol_mem()
+		static size( next? : {
+			width : number
+			height : number
+		} ) {
+			return next || {
+				width : window.innerWidth ,
+				height : window.innerHeight ,
+			}
 		}
 		
 	}
 	
 	window.addEventListener( 'resize' , ()=> {
-		$mol_window.size( void 0 )
+		$mol_window.size( null )
 	} )
 	
 }

@@ -1,8 +1,8 @@
-module $ {
+namespace $ {
 	
 	export class $mol_server extends $mol_object {
 		
-		@ $mol_prop()
+		@ $mol_mem()
 		express() {
 			var express = $node.express()
 			
@@ -25,7 +25,7 @@ module $ {
 		}
 		
 		messageStart( port : number ) {
-			return `${this.objectPath()} started at http://127.0.0.1:${port}/`
+			return `${ this } started at http://127.0.0.1:${ port }/`
 		}
 		
 		expressHandlers() : any[] {

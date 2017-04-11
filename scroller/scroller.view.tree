@@ -1,8 +1,0 @@
-$mol_scroller $mol_viewer
-	field *
-		scrollTop < scrollTop 0
-		scrollLeft < scrollLeft 0
-	event *
-		scroll > eventScroll null
-		overflow > eventScroll null
-		underflow > eventScroll null

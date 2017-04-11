@@ -1,24 +1,26 @@
-module $ {
+namespace $ {
 	$mol_test( {
 		
 		'materialization'() {
 			
-			var list = new $mol_range_lazy(
+			var list = $mol_range_in(
 				{
-					get : id => id * 2 ,
+					item : id => id * 2 ,
 					get length() { return 5 } ,
 				}
 			)
 			
-			$mol_assert_equal( list.valueOf()[ 2 ] , 4 )
-			$mol_assert_equal( list.valueOf()[ 5 ] , void 0 )
+			var list2 = list.valueOf() as number[]
+			
+			$mol_assert_equal( list2[ 2 ] , 4 )
+			$mol_assert_equal( list2[ 5 ] , void 0 )
 		} ,
 		
 		'lazy slicing'() {
 			
-			var list = new $mol_range_lazy(
+			var list = $mol_range_in(
 				{
-					get : id => id * 2 ,
+					item : id => id * 2 ,
 					get length() { return Number.POSITIVE_INFINITY } ,
 				}
 			)
@@ -29,21 +31,21 @@ module $ {
 		
 		'lazy concatenation'() {
 			
-			var list1 = new $mol_range_lazy(
+			var list1 = $mol_range_in(
 				{
-					get( id ){ return id * 2 } ,
+					item( id ){ return id * 2 } ,
 					get length() { return 3 } ,
 				}
 			)
-			var list2 = new $mol_range_lazy(
+			var list2 = $mol_range_in(
 				{
-					get( id ){ return id * 3 } ,
+					item( id ){ return id * 3 } ,
 					get length() { return 3 } ,
 				}
 			)
-			var list3 = new $mol_range_lazy(
+			var list3 = $mol_range_in(
 				{
-					get( id ){ return id * 4 } ,
+					item( id ){ return id * 4 } ,
 					get length() { return 3 } ,
 				}
 			)
@@ -53,9 +55,9 @@ module $ {
 		
 		'every'() {
 			
-			var list = new $mol_range_lazy(
+			var list = $mol_range_in(
 				{
-					get( id ){ return id * 2 } ,
+					item( id ){ return id * 2 } ,
 					get length() { return 3 }
 				}
 			)
@@ -66,9 +68,9 @@ module $ {
 		
 		'some'() {
 			
-			var list = new $mol_range_lazy(
+			var list = $mol_range_in(
 				{
-					get( id ){ return id * 2 } ,
+					item( id ){ return id * 2 } ,
 					get length() { return 3 }
 				}
 			)

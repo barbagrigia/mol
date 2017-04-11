@@ -1,4 +1,4 @@
-module $.$mol {
+namespace $.$mol {
 	export class $mol_dimmer extends $.$mol_dimmer {
 		
 		parts() {
@@ -16,7 +16,7 @@ module $.$mol {
 			return chunks
 		}
 		
-		@ $mol_prop()
+		@ $mol_mem()
 		strings() {
 			return this.haystack().split( this.needle() )
 		}

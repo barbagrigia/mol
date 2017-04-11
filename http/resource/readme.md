@@ -5,66 +5,51 @@ Reactive HTTP resource.
 ## Usage example
 
 ```typescript
-module $ {
-	export interface $my_data {
+namespace $ {
+	
+	export interface $my_domain_data {
 		login? : string
 		password? : string
 	} 
 	
 	export class $my_domain extends $mol_object {
 		
-		@ $mol_prop()
+		@ $mol_mem()
 		text() {
 			return $mol_http_resource.item( '//exmaple.org/text.txt' ).text()
 		}
 		
-		@ $mol_prop()
-		data( ...diff : $my_data[] ) {
+		@ $mol_mem()
+		data( next? : $my_data ) {
 			const uri = '//exmaple.org/data.json'
-			const resource = $mol_http_resource_json.item< $my_data >( uri )
-			return resource.json( ...diff )
+			const resource = $mol_http_resource_json.item< $my_domain_data >( uri )
+			return resource.json( next )
 		}
 		
 		login() {
 			return this.data().login
 		}
 		
-		password( ...diff : string[] ) {
-			return this.data( ...diff.map( password => ({ password }) ) ).password
+		password( next? : string ) {
+			return this.data( next && { password : next } ).password
 		}
 		
 	}
 }
 ```
 
-## Properties
+## Properties $mol_http_resource
 
 **`uri() : string`**
 
 URI of resource.
 
-**`text( ...diff : string[] ) : string`**
+**`text( next? : string ) : string`**
 
 Text content of resource. Uses 'Get' and 'Put' http requests on getting and setting value.
 
-**`refresh()`**
+### Properties of $mol_http_resource_json
 
-Reload data from server.
-
-**`uploaded() : boolean`**
-
-Returns true when upload completed. Throws exceptions if any errors occurred.
-
-**`downloader() : $mol_http_request`**
-
-Request for download content.
-
-**`uploader() : $mol_http_request`**
-
-Request for upload content.
-
-# $mol_http_resource_json
-
-**`json< Data >( ...diff : Data[] ) : Data`**
+**`json< Data >( next? : Data ) : Data`**
 
 JSON representation of resource.

@@ -1,15 +1,35 @@
 <!doctype html>
-<html style="height:100%" mol_skin_root>
-	<head>
-		<title>$mol</title>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width" />
-		<link href="-/web.css" rel="stylesheet"/>
-		<link href="logo/logo.png" rel="icon" />
-	</head>
-	<body style="height:100%;margin:0">
-		<script src="-/web.js" charset="utf-8"></script>
-		<script src="-/web.test.js" charset="utf-8" async></script>
-		<div mol_viewer_root="$mol_app_demo"></div>
-	</body>
-</html>
+<html style=" height : 100% ">
+
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1">
+
+<link rel="manifest" href="manifest.json">
+
+<!-- description -->
+<meta name="description" content="$mol framework demo application">
+<meta name="application-name" content="$mol">
+<meta name="apple-mobile-web-app-title" content="$mol Demo">
+
+<!-- colors -->
+<meta name="theme-color" content="#53ac71">
+<meta name="msapplication-TileColor" content="#53ac71">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+<!-- logo -->
+<link href="logo/logo.png" rel="icon" />
+<link rel="apple-touch-icon" sizes="128x128" href="logo/logo_128.png">
+<link rel="apple-touch-icon-precomposed" sizes="128x128" href="logo/logo_128.png">
+<meta name="msapplication-TileImage" content="logo/logo_192.png">
+
+<!-- full screen -->
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+<link href="-/web.css" rel="stylesheet"/>
+
+<body mol_view_root="$mol_app_demo">
+
+<script src="-/web.js" charset="utf-8"></script>
+<script src="-/web.test.js" charset="utf-8" async></script>
+<script>$mol_file.root = function(){ return $mol_file.relative( '..' ) }</script>

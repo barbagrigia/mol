@@ -1,13 +1,11 @@
-$mol_labeler_demo $mol_rower childs /
-	< labeler1 $mol_labeler
-		title < providerLabel @ \Provider
-		content < providerName @ \ACME Provider Inc.
-	< labeler2 $mol_labeler
-		title < costLabel @ \Cost
-		content $mol_coster value $mol_unit_money_usd valueOf 1234567
-	< labeler3 $mol_labeler
-		title < consumerLabel @ \Consumer
-		content < consumerName @ \ACME Consumer Inc.
-	< labeler4 $mol_labeler
-		title < remarkLabel @ \Remark
-		content $mol_stringer value < remarkValue @ \Remind me later
+$mol_labeler_demo $mol_row
+	title @ \Labeled content of some types
+	sub /
+		<= Provider $mol_labeler
+			title \Provider
+			content \ACME Provider Inc.
+		<= Name $mol_labeler
+			title \User name
+			Content <= Name_control $mol_string
+				hint \Jack Sparrow
+				value?val <=> user_name?val \

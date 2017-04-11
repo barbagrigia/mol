@@ -1,4 +1,4 @@
-module $ {
+namespace $ {
 	
 	export function $mol_log( path : string , values : any[] ) {
 		
@@ -6,17 +6,17 @@ module $ {
 		if( filter == null ) return
 		if( path.indexOf( filter ) === -1 ) return
 		
-		var time = new Date().toISOString().substring( 11 , 19 )
-		console.log( time , path , ...values )
+		var time = new Date().toLocaleTimeString()
+		console.log( time , path , values )
 	}
 	
-	export module $mol_log {
+	export namespace $mol_log {
 		
 		var _filter : string
 		
-		export function filter( ...diff : string[] ) {
-			if( diff[ 0 ] !== void 0 ) {
-				_filter = diff[ 0 ]
+		export function filter( next? : string ) {
+			if( next !== void 0 ) {
+				_filter = next
 			}
 			
 			if( _filter !== void 0 ) return _filter
